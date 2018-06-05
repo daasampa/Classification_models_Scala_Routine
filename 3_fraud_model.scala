@@ -1,4 +1,19 @@
-object models{
+/*Using the object-oriented capabilities available in the Scala language the next object (models) performs all calculations that respond
+the question: is there a reliable method to predict the probability a customer experience fraud?.
+The model object contains five (5) methods each one, as their name indicates, estimate a different classification algorithm.
+After conscisness checking of this source code is possible to verify a frequent pattern on it's structure:
+	1. There's always an assembler who "compress" the features into a single shape, the scala vector shape.
+	2. The algorithm who gives the name to the object's method. Each one is a different scala class imported from the MLLib clases.
+	3. An array which takes the percentage parameter to create two data sets. First for estimation, second for prediction.
+	4. The pipeline instance who takes two stages: assembler and the method's algorithm.
+	5. A multidimensional grid for cross-validation procedure that is performed on the estimation set. 
+	6. The metric used in the cross-validation is set as the evaluator value.
+	7. cv (cross-validator) gathers the pipeline, the evaluator, the paramGrid values and the number of folds.
+	8. cvModel store the result (the "best" model) using the estimation data. This instance is saved by the cv.save.
+	9. The prediction data set is transformed using the cvModel. The "best" model provides a probability score and class
+	   to each row, i.e., to each customer whose data weren't used to fit the algorithm.
+   	10. The final results are displayed in a dataframe structure.*/
+object models {
 def decision_tree(features:Array[String], percentage:Double, depth:Array[Int], folds:Int) : org.apache.spark.sql.DataFrame = {
 val assembler = new VectorAssembler().setInputCols(features).setOutputCol("features")
 val dt = new DecisionTreeClassifier().setLabelCol("fraude").setFeaturesCol("features")
@@ -82,95 +97,3 @@ val results = predictions.withColumn("label", when($"fraude" === 1.0, "FRAUDE").
 return results
 }
 }
-
-val data_gmm = spark.sql("""select documento,
-							ifnull(svp_cnt_trx_no_monetarias_mes, 0) as c_1,
-							ifnull(svp_cnt_trx_monetarias_mes, 0) as c_2,
-							ifnull(svp_mnt_trx_monetarias_mes, 0) as c_3,
-							ifnull(svp_max_cnt_trx_monetarias_mes, 0) as c_4,
-							ifnull(svp_max_cnt_trx_no_monetarias_mes, 0) as c_5,
-							ifnull(svp_mnt_trx_transfer_mes, 0) as c_6,
-							ifnull(svp_cnt_trx_transfer_mes, 0) as c_7,
-							ifnull(svp_max_cnt_trx_mes, 0) as c_8,
-							ifnull(svp_mnt_trx_transfer_lineneg_mes, 0) as c_9,
-							ifnull(svp_cnt_trx_transfer_lineneg_mes, 0) as c_10,
-							ifnull(svp_max_cnt_trx_transfer_lineneg_mes, 0) as c_11,
-							ifnull(svp_mnt_trx_pag_factu_mes, 0) as c_12,
-							ifnull(svp_cnt_trx_pag_factu_mes, 0) as c_13,
-							ifnull(svp_max_cnt_trx_pag_factu_mes, 0) as c_14,
-							ifnull(svp_mnt_trx_audcred_mes, 0) as c_15,
-							ifnull(svp_cnt_trx_audcred_mes, 0) as c_16,
-							ifnull(svp_max_cnt_trx_audcred_mes, 0) as c_17,
-							ifnull(svp_mnt_trx_e_prepag_mes, 0) as c_18,
-							ifnull(svp_cnt_trx_e_prepag_mes, 0) as c_19,
-							ifnull(svp_max_cnt_trx_e_prepag_mes, 0) as c_20,
-							ifnull(svp_mnt_trx_pagtc_mes, 0) as c_21,
-							ifnull(svp_cnt_trx_pagtc_mes, 0) as c_22,
-							ifnull(svp_max_cnt_trx_pagtc_mes, 0) as c_23,
-							ifnull(svp_cnt_trx_consulta_saldo_mes, 0) as c_24,
-							ifnull(app_cnt_trx_no_monetarias_mes, 0) as c_25,
-							ifnull(app_cnt_trx_monetarias_mes, 0) as c_26,
-							ifnull(app_mnt_trx_monetarias_mes, 0) as c_27,
-							ifnull(app_max_cnt_trx_monetarias_mes, 0) as c_28,
-							ifnull(app_max_cnt_trx_no_monetarias_mes, 0) as c_29,
-							ifnull(app_mnt_trx_transfer_mes, 0) as c_30,
-							ifnull(app_cnt_trx_transfer_mes, 0) as c_31,
-							ifnull(app_max_cnt_trx_mes, 0) as c_32,
-							ifnull(app_mnt_trx_transfer_lineneg_mes, 0) as c_33,
-							ifnull(app_cnt_trx_transfer_lineneg_mes, 0) as c_34,
-							ifnull(app_max_cnt_trx_transfer_lineneg_mes, 0) as c_35,
-							ifnull(app_mnt_trx_pag_factu_mes, 0) as c_36,
-							ifnull(app_cnt_trx_pag_factu_mes, 0) as c_37,
-							ifnull(app_max_cnt_trx_pag_factu_mes, 0) as c_38,
-							ifnull(app_mnt_trx_pagtc_mes, 0) as c_39,
-							ifnull(app_cnt_trx_pagtc_mes, 0) as c_40,
-							ifnull(app_max_cnt_trx_pagtc_mes, 0) as c_41,
-							ifnull(app_cnt_trx_consulta_saldo_mes, 0) as c_42
-							from resultados_seguridad_externa.dsc_mdd_transaccional
-							where f_act = 20180515 and documento is not null
-							order by documento asc""")
-
-val data_gmm = spark.sql("select * from proceso_seguridad_externa.scoring_variables_preferenciales order by documento")
-data_gmm.cache()
-
-val complete_gmm = data_gmm.drop("documento")
-
-def select_vars(variable:String) : Double = {
-return (scaled_data.filter(scaled_data(variable) === 0).count().toDouble / complete_gmm.count().toDouble)*100
-}
-
-val names = complete_gmm.drop("documento_virtuales","indicador").columns
-val percentage_zeros = complete_gmm.drop("documento_virtuales","indicador").columns.map(x => select_vars(x))
-
-val results = sc.parallelize(names zip percentage_zeros).toDF("names", "percentage_zeros")
-
-results.orderBy(desc("percentage_zeros")).show()
-
-results.filter(results("percentage_zeros") >= 50.0).select("names").orderBy(asc("percentage_zeros")).show()
-
-val features = complete_gmm.drop("documento_virtuales","indicador","t1_visa","t5_visa","t4_visa","t2_visa","t1_master","t5_master","t4_master","t3_visa","t2_master","t3_master","c_12","c_14","c_13","t6_visa","t6_master","t1_amex","c_9","c_11","c_10","t2_amex").columns
-
-val assembler = new VectorAssembler().setInputCols(features).setOutputCol("features")
-val scaler = new MinMaxScaler().setInputCol("features").setOutputCol("scaledFeatures")
-
-
-val assembled_data = assembler.transform(complete_gmm.drop("t1_visa","t5_visa","t4_visa","t2_visa","t1_master","t5_master","t4_master","t3_visa","t2_master","t3_master","c_12","c_14","c_13","t6_visa","t6_master","t1_amex","c_9","c_11","c_10","t2_amex"))
-val scaler_object = scaler.fit(assembled_data)
-
-val scaled_data = scaler_object.transform(assembled_data)
-
-
-val gmm = new GaussianMixture().setK(10).setFeaturesCol("scaledFeatures")
-
-val trainingData = scaled_data.filter(scaled_data("indicador") === "estimación")
-trainingData.cache()
-val testData = scaled_data.filter(scaled_data("indicador") === "pronóstico")
-testData.cache()
-
-val model = gmm.fit(trainingData)
-val trainingData_model = model.transform(trainingData)
-trainingData_model.cache()
-trainingData_model.groupBy("prediction").agg(count("documento_virtuales").alias("clientes")).orderBy(desc("clientes")).show()
-val testData_model = model.transform(testData)
-testData_model.cache()
-testData_model.groupBy("prediction").agg(count("documento_virtuales").alias("clientes")).orderBy(desc("clientes")).show()
