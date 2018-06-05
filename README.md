@@ -1,5 +1,5 @@
 # Binary classifications models.
-# Customes fraud predictions: Machine Learning Classes.
+# Customers fraud predictions: Machine Learning Classes.
 <p align="center"><img src = "https://upload.wikimedia.org/wikipedia/commons/f/f3/Apache_Spark_logo.svg">
 
 Contains the codes for Spark's Scala API classifications methods based on the MLLib Library Dataframe API.
