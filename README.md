@@ -2,7 +2,7 @@
 # Customers fraud predictions: Machine Learning Classes.
 <p align="center"><img src = "https://upload.wikimedia.org/wikipedia/commons/f/f3/Apache_Spark_logo.svg">
 
-Contains the codes for Spark's Scala API classifications methods based on the MLLib Library Dataframe API.
+Here we have the codes for Spark's Scala API classifications methods based on the MLLib Library Dataframe API.
 
 This repository was built to respond the requierement of predicting the fraud class probability regarding a group of significant variables for a particular set of customers. The result, the confussion matrix of each method, can be written into HDFS by implementing a few lines of extra code. 
 The data loaded into the Spark session arrives from HDFS and it's design came from a Cloudera Impala ETL. The Impala SQL is not currently available in this repository. The user can define the elements inside this repository as a functional API that allows the estimation of 5 different types of statistical methods: decision tres, adaptative boosting based on trees, random forest, logistic regression and naive-Bayes for binary classification (it's possible to consider the multi-level classification case). The performance of calculations depends on the Spark's pipeline stages model.
