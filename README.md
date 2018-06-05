@@ -15,4 +15,8 @@ The correct order for understanding this **_"development"_** goes as the followi
   Import the data set, stored in HDFS, into Spark session. The data structure is org.apache.spark.sql.DataFrame. After user calling the the data set is parallelized with the **cache()** instruction. This one is extremely important since calculations are running in parallel using the resources of the cluster.
   
 ### 3. Fraud model (fraud_model.scala): :space_invader:
-  The final implementation where the API's **_kernel_** dwells. The user can call all the 5 methods in the usual _object-oriented_ form previous **Modules** asnd **Data set** call. Inside every method there's a routine performed by the pipeline model; the stages are: _vector assembler_, _minmax scaler_ (it's possible to invoke others), _the machine learning method_ and _pipeline_ itself.
+  The final implementation where the API's **_kernel_** dwells. The user can call all the 5 methods in the usual _object-oriented_ form previous **Modules** asnd **Data set** call. Inside every method there's a routine performed by the pipeline model; the stages are: _vector assembler_, _minmax scaler_ (it's possible to invoke others), _the machine learning method_ and the _pipeline_ itself.
+  
+The last file **_Execution.scala_** contains just the code lines to execute on the **_Spark shell_**.
+
+Finally I must say that the Spark's version used was the **_2.2.0_**. :white_check_mark: :white_check_mark: :white_check_mark:
