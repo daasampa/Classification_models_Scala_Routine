@@ -22,6 +22,6 @@ The last file **_Execution.scala_** contains just the code lines to execute on t
 Finally I must say that the Spark's version used was the **_2.2.0_**. :white_check_mark: :white_check_mark: :white_check_mark:
 
 **_Considerations_**:
-### 1. The current way to access Spark is through **_SFTP_** connection. **MobaXterm** is an alternative to doing so, but it has no support, indeed, is has IT restrictions, however, it's our only tool.
-### 2. The source codes in this repository can not be executed inside the GitHub platform.
-### 3. The updates published here are for the good of the version control. The new versions themselves don't migrate directly to Landing Zone. The user has to copy these new versions into the node using e.g. WinSPC. 
+###### 1. The current way to access Spark is through **_SFTP_** connection. **MobaXterm** is an alternative to doing so, but it has no support, indeed, is has IT restrictions, however, it's our only tool.
+###### 2. The source codes in this repository can not be executed inside the GitHub platform.
+###### 3. The updates published here are for the good of the version control. The new versions themselves don't migrate directly to Landing Zone. The user has to copy these new versions into the node using e.g. WinSPC. 
