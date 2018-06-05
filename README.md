@@ -5,7 +5,7 @@
 Here we have the codes for Spark's Scala API classifications methods based on the MLLib Library Dataframe API.
 
 This repository was built to respond the requierement of predicting the fraud class probability regarding a group of significant variables for a particular set of customers. The result, confussion matrix of each method, can be written into HDFS by implementing a few lines of extra code. 
-The data loaded into the Spark session arrives from HDFS and it's design came from a Cloudera Impala ETL. The Impala SQL is not currently available in this repository. The user can define the elements inside this repository as a functional API that allows the estimation of 5 different types of statistical methods: decision tres, adaptative boosting based on trees, random forest, logistic regression and naive-Bayes for binary classification (it's possible to consider the multi-level classification case). The performance of calculations depends on the Spark's pipeline stages model.
+The data loaded into the Spark session arrives from HDFS and it's design came from a Cloudera Impala ETL. The Impala SQL is not currently available in this repository. The user can define the elements inside this repository as a functional API that allows the estimation of 5 different types of statistical methods: decision tres; adaptative boosting based on trees; random forest; logistic regression and naive-Bayes for binary classification (it's possible to consider the multi-level classification case). The performance of calculations depends on the Spark's pipeline stages model.
 
 The correct order for understanding this **_"development"_** goes as the following:
 
