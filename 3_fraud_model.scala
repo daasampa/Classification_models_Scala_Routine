@@ -1,9 +1,9 @@
 /*Using the object-oriented capabilities available in the Scala language the next object (models) performs all calculations that responds
 the question: is there a reliable method to predict the probability a customer experience fraud?.
 The model object contains five (5) methods each one, as their name indicates, estimate a different classification algorithm.
-After conscisness checking of this source code is possible to verify a frequent pattern on it's structure:
-	1. There's always an assembler who "compress" the features into a single shape, the scala vector shape.
-	2. The algorithm who gives the name to the object's method. Each one is a different scala class imported from the MLLib clases.
+After conscientious checking of this source code is possible to verify a frequent pattern on it's structure:
+	1. There's always an assembler who "compresses" the features into a single shape, the Scala vector shape.
+	2. The algorithm who gives the name to the object's method. Each one is a different Scala class imported from the MLLib clases.
 	3. An array which takes the percentage parameter to create two data sets. First for estimation, second for prediction.
 	4. The pipeline instance who takes two stages: assembler and the method's algorithm.
 	5. A multidimensional grid for cross-validation procedure that is performed on the estimation set. 
