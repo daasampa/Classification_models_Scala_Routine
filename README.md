@@ -10,7 +10,7 @@ The data loaded into the Spark session arrives from HDFS and it's design came fr
 The correct order for understanding this **_"development"_** goes as the following:
 
 ### 1. Modules (modules_fraud_model.scala): :books:
-  Import the Scala classes needed to transform data and estimate the different methods. The latter is defined through the Cross-validation model using the AUPR metric (area under precision-recall curve). It's .
+  Import the Scala classes needed to transform data and estimate the different methods. The latter is defined through the Cross-validation model using the AUPR metric (area under precision-recall curve).
   
 ### 2. Data set (data_set_fraud_model.scala): :floppy_disk:
   Import the data set, stored in HDFS, into Spark session. The data structure is org.apache.spark.sql.DataFrame. After user calling the the data set is parallelized with the **cache()** instruction. This one is extremely important since calculations are running in parallel using the resources of the cluster.
