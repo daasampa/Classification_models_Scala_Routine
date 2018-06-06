@@ -1,4 +1,4 @@
-/*Using the object-oriented capabilities available in the Scala language the next object (models) performs all calculations that respond
+/*Using the object-oriented capabilities available in the Scala language the next object (models) performs all calculations that responds
 the question: is there a reliable method to predict the probability a customer experience fraud?.
 The model object contains five (5) methods each one, as their name indicates, estimate a different classification algorithm.
 After conscisness checking of this source code is possible to verify a frequent pattern on it's structure:
