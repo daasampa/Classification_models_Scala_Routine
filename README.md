@@ -1,4 +1,4 @@
-# Binary classifications models.
+# Binary classification models.
 # Customers fraud predictions: Machine Learning Classes.
 <p align="center"><img src = "https://upload.wikimedia.org/wikipedia/commons/f/f3/Apache_Spark_logo.svg">
 
