@@ -14,6 +14,15 @@ After conscientious checking of this source code is possible to verify a frequen
 	   to each row, i.e., to each customer whose data weren't used to fit the algorithm.
    	10. The final results are displayed in a dataframe structure.*/
 object models {
+def lambda(dataframe : org.apache.spark.sql.DataFrame, feature : String) : Double = {
+return (dataframe.filter(dataframe(feature) === 0).count().toDouble / dataframe.count().toDouble) * 100
+}
+def view_features(dataframe : org.apache.spark.sql.DataFrame) : org.apache.spark.sql.DataFrame = {
+val features = dataframe.drop("documento", "segmento", "fraude").columns
+val percentage_zeros = features.map(x => models.lambda(dataframe, x))
+val results = sc.parallelize(features zip percentage_zeros).toDF("features", "percentage_zeros")
+return results.orderBy(desc("percentage_zeros"))
+}
 def decision_tree(features:Array[String], percentage:Double, depth:Array[Int], folds:Int) : org.apache.spark.sql.DataFrame = {
 val assembler = new VectorAssembler().setInputCols(features).setOutputCol("features")
 val dt = new DecisionTreeClassifier().setLabelCol("fraude").setFeaturesCol("features")
@@ -29,7 +38,7 @@ val cvModel = cv.fit(trainingData)
 cvModel.save("dt_fraud_model")
 val predictions = cvModel.transform(testData)
 predictions.cache()
-val results = predictions.withColumn("label", when($"fraude"===1.0, "FRAUDE").otherwise("NO_FRAUDE")).withColumn("predicted_label", when($"prediction" === 1.0,"FRAUDE").otherwise("NO_FRAUDE")).groupBy("label", "predicted_label").agg(count("documento").alias("clientes")).orderBy("label", "predicted_label")
+val results = predictions.withColumn("label", "fraude").withColumn("predicted_label", "prediction").groupBy("label", "predicted_label").agg(count("documento").alias("clientes")).orderBy("label", "predicted_label")
 return results
 }
 def ada_boost(features:Array[String], percentage:Double, depth:Array[Int], n_trees:Array[Int], folds:Int):org.apache.spark.sql.DataFrame={
@@ -47,7 +56,7 @@ val cvModel = cv.fit(trainingData)
 cvModel.save("gbt_fraud_model")
 val predictions = cvModel.transform(testData)
 predictions.cache()
-val results = predictions.withColumn("label", when($"fraude"===1.0,"FRAUDE").otherwise("NO_FRAUDE")).withColumn("predicted_label", when($"prediction" === 1.0, "FRAUDE").otherwise("NO_FRAUDE")).groupBy("label", "predicted_label").agg(count("documento").alias("clientes")).orderBy("label", "predicted_label")
+val results = predictions.withColumn("label", "fraude").withColumn("predicted_label", "prediction").groupBy("label", "predicted_label").agg(count("documento").alias("clientes")).orderBy("label", "predicted_label")
 return results
 }
 def random_forest(features:Array[String], percentage:Double, depth:Array[Int], n_trees:Array[Int], folds:Int) : org.apache.spark.sql.DataFrame = {
@@ -65,7 +74,7 @@ val cvModel = cv.fit(trainingData)
 cvModel.save("rf_fraud_model")
 val predictions = cvModel.transform(testData)
 predictions.cache()
-val results = predictions.withColumn("label", when($"fraude" === 1.0, "FRAUDE").otherwise("NO_FRAUDE")).withColumn("predicted_label",when($"prediction"===1.0,"FRAUDE").otherwise("NO_FRAUDE")).groupBy("label", "predicted_label").agg(count("documento").alias("clientes")).orderBy("label", "predicted_label")
+val results = predictions.withColumn("label", "fraude").withColumn("predicted_label", "prediction").groupBy("label", "predicted_label").agg(count("documento").alias("clientes")).orderBy("label", "predicted_label")
 return results
 }
 def logistic_regression(features:Array[String], percentage:Double) : org.apache.spark.sql.DataFrame = {
@@ -79,7 +88,7 @@ val model = pipeline.fit(trainingData)
 model.save("lr_fraud_model")
 val predictions = model.transform(testData)
 predictions.cache()
-val results = predictions.withColumn("label", when($"fraude" === 1.0, "FRAUDE").otherwise("NO_FRAUDE")).withColumn("predicted_label",when($"prediction"===1.0,"FRAUDE").otherwise("NO_FRAUDE")).groupBy("label", "predicted_label").agg(count("documento").alias("clientes")).orderBy("label", "predicted_label")
+val results = predictions.withColumn("label", "fraude").withColumn("predicted_label", "prediction").groupBy("label", "predicted_label").agg(count("documento").alias("clientes")).orderBy("label", "predicted_label")
 return results
 }
 def naive_Bayes(features:Array[String], percentage:Double, apriori:String) : org.apache.spark.sql.DataFrame = {
@@ -93,7 +102,7 @@ val model = pipeline.fit(trainingData)
 model.save("nb_fraud_model")
 val predictions = model.transform(testData)
 predictions.cache()
-val results = predictions.withColumn("label", when($"fraude" === 1.0, "FRAUDE").otherwise("NO_FRAUDE")).withColumn("predicted_label",when($"prediction"===1.0,"FRAUDE").otherwise("NO_FRAUDE")).groupBy("label", "predicted_label").agg(count("documento").alias("clientes")).orderBy("label", "predicted_label")
+val results = predictions.withColumn("label", "fraude").withColumn("predicted_label", "prediction").groupBy("label", "predicted_label").agg(count("documento").alias("clientes")).orderBy("label", "predicted_label")
 return results
 }
 }
