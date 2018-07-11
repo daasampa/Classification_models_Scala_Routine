@@ -1,18 +1,3 @@
-/*Using the object-oriented capabilities available in the Scala language the next object (models) performs all calculations that responds
-the question: is there a reliable method to predict the probability a customer experience fraud?.
-The model object contains five (5) methods each one, as their name indicates, estimate a different classification algorithm.
-After conscientious checking of this source code is possible to verify a frequent pattern on it's structure:
-	1. There's always an assembler who "compresses" the features into a single shape, the Scala vector shape.
-	2. The algorithm who gives the name to the object's method. Each one is a different Scala class imported from the MLLib clases.
-	3. An array which takes the percentage parameter to create two data sets. First for estimation, second for prediction.
-	4. The pipeline instance who takes two stages: assembler and the method's algorithm.
-	5. A multidimensional grid for cross-validation procedure that is performed on the estimation set. 
-	6. The metric used in the cross-validation is set as the evaluator value.
-	7. cv (cross-validator) gathers the pipeline, the evaluator, the paramGrid values and the number of folds.
-	8. cvModel store the result (the "best" model) using the estimation data. This instance is saved by the cv.save.
-	9. The prediction data set is transformed using the cvModel. The "best" model provides a probability score and class
-	   to each row, i.e., to each customer whose data weren't used to fit the algorithm.
-   	10. The final results are displayed in a dataframe structure.*/
 object models {
 def lambda(dataframe : org.apache.spark.sql.DataFrame, feature : String) : Double = {
 return (dataframe.filter(dataframe(feature) === 0).count().toDouble / dataframe.count().toDouble) * 100
@@ -37,7 +22,7 @@ testData.cache()
 val cvModel = cv.fit(trainingData)
 val predictions = cvModel.transform(testData)
 predictions.cache()
-val results = predictions.withColumn("label", "fraude").withColumn("predicted_label", "prediction").groupBy("label", "predicted_label").agg(count("documento").alias("clientes")).orderBy("label", "predicted_label")
+val results = predictions.withColumnRenamed("label", "fraude").withColumnRenamed("predicted_label", "prediction").groupBy("fraude", "prediction").agg(count("documento").alias("clientes")).orderBy("fraude", "prediction")
 val table_name = ("results_decision_tree_" ++ features).mkString
 results.createOrReplaceTempView(table_name)
 spark.sql("drop table if exists proceso_seguridad_externa." ++ table_name)
@@ -57,7 +42,7 @@ testData.cache()
 val cvModel = cv.fit(trainingData)
 val predictions = cvModel.transform(testData)
 predictions.cache()
-val results = predictions.withColumn("label", "fraude").withColumn("predicted_label", "prediction").groupBy("label", "predicted_label").agg(count("documento").alias("clientes")).orderBy("label", "predicted_label")
+val results = predictions.withColumnRenamed("label", "fraude").withColumnRenamed("predicted_label", "prediction").groupBy("fraude", "prediction").agg(count("documento").alias("clientes")).orderBy("fraude", "prediction")
 val table_name = ("results_ada_boost_" ++ features).mkString
 results.createOrReplaceTempView(table_name)
 spark.sql("drop table if exists proceso_seguridad_externa." ++ table_name)
@@ -77,7 +62,7 @@ testData.cache()
 val cvModel = cv.fit(trainingData)
 val predictions = cvModel.transform(testData)
 predictions.cache()
-val results = predictions.withColumn("label", "fraude").withColumn("predicted_label", "prediction").groupBy("label", "predicted_label").agg(count("documento").alias("clientes")).orderBy("label", "predicted_label")
+val results = predictions.withColumnRenamed("label", "fraude").withColumnRenamed("predicted_label", "prediction").groupBy("fraude", "prediction").agg(count("documento").alias("clientes")).orderBy("fraude", "prediction")
 val table_name = ("results_random_forest_" ++ features).mkString
 results.createOrReplaceTempView(table_name)
 spark.sql("drop table if exists proceso_seguridad_externa." ++ table_name)
@@ -93,7 +78,7 @@ testData.cache()
 val model = pipeline.fit(trainingData)
 val predictions = model.transform(testData)
 predictions.cache()
-val results = predictions.withColumn("label", "fraude").withColumn("predicted_label", "prediction").groupBy("label", "predicted_label").agg(count("documento").alias("clientes")).orderBy("label", "predicted_label")
+val results = predictions.withColumnRenamed("label", "fraude").withColumnRenamed("predicted_label", "prediction").groupBy("fraude", "prediction").agg(count("documento").alias("clientes")).orderBy("fraude", "prediction")
 val table_name = ("results_logistic_regresion_" ++ features).mkString
 results.createOrReplaceTempView(table_name)
 spark.sql("drop table if exists proceso_seguridad_externa." ++ table_name)
@@ -109,7 +94,7 @@ testData.cache()
 val model = pipeline.fit(trainingData)
 val predictions = model.transform(testData)
 predictions.cache()
-val results = predictions.withColumn("label", "fraude").withColumn("predicted_label", "prediction").groupBy("label", "predicted_label").agg(count("documento").alias("clientes")).orderBy("label", "predicted_label")
+val results = predictions.withColumnRenamed("label", "fraude").withColumnRenamed("predicted_label", "prediction").groupBy("fraude", "prediction").agg(count("documento").alias("clientes")).orderBy("fraude", "prediction")
 val table_name = ("results_naive_Bayes_" ++ features).mkString
 results.createOrReplaceTempView(table_name)
 spark.sql("drop table if exists proceso_seguridad_externa." ++ table_name)
