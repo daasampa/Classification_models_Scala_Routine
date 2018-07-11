@@ -23,7 +23,7 @@ val percentage_zeros = features.map(x => models.lambda(dataframe, x))
 val results = sc.parallelize(features zip percentage_zeros).toDF("features", "percentage_zeros")
 return results.orderBy(desc("percentage_zeros"))
 }
-def decision_tree(features:Array[String], percentage:Double, depth:Array[Int], folds:Int) : org.apache.spark.sql.DataFrame = {
+def decision_tree(features:Array[String], percentage:Double, depth:Array[Int], folds:Int) : Unit = {
 val assembler = new VectorAssembler().setInputCols(features).setOutputCol("features")
 val dt = new DecisionTreeClassifier().setLabelCol("fraude").setFeaturesCol("features")
 val Array(trainingData,testData) = base_modelo.randomSplit(Array(percentage, 1 - percentage))
@@ -35,13 +35,15 @@ val cv = new CrossValidator().setEstimator(pipeline).setEvaluator(evaluator).set
 trainingData.cache()
 testData.cache()
 val cvModel = cv.fit(trainingData)
-cvModel.save("dt_fraud_model")
 val predictions = cvModel.transform(testData)
 predictions.cache()
 val results = predictions.withColumn("label", "fraude").withColumn("predicted_label", "prediction").groupBy("label", "predicted_label").agg(count("documento").alias("clientes")).orderBy("label", "predicted_label")
-return results
+val table_name = ("results_decision_tree_" ++ features).mkString
+results.createOrReplaceTempView(table_name)
+spark.sql("drop table if exists proceso_seguridad_externa." ++ table_name)
+spark.sql("create table if not exists proceso_seguridad_externa." ++ table_name ++ " stored as parquet as select * from " ++ table_name)
 }
-def ada_boost(features:Array[String], percentage:Double, depth:Array[Int], n_trees:Array[Int], folds:Int):org.apache.spark.sql.DataFrame={
+def ada_boost(features:Array[String], percentage:Double, depth:Array[Int], n_trees:Array[Int], folds:Int) : Unit = {
 val assembler = new VectorAssembler().setInputCols(features).setOutputCol("features")
 val gbt = new GBTClassifier().setLabelCol("fraude").setFeaturesCol("features")
 val Array(trainingData, testData) = base_modelo.randomSplit(Array(percentage, 1 - percentage))
@@ -53,13 +55,15 @@ val cv = new CrossValidator().setEstimator(pipeline).setEvaluator(evaluator).set
 trainingData.cache()
 testData.cache()
 val cvModel = cv.fit(trainingData)
-cvModel.save("gbt_fraud_model")
 val predictions = cvModel.transform(testData)
 predictions.cache()
 val results = predictions.withColumn("label", "fraude").withColumn("predicted_label", "prediction").groupBy("label", "predicted_label").agg(count("documento").alias("clientes")).orderBy("label", "predicted_label")
-return results
+val table_name = ("results_ada_boost_" ++ features).mkString
+results.createOrReplaceTempView(table_name)
+spark.sql("drop table if exists proceso_seguridad_externa." ++ table_name)
+spark.sql("create table if not exists proceso_seguridad_externa." ++ table_name ++ " stored as parquet as select * from " ++ table_name)
 }
-def random_forest(features:Array[String], percentage:Double, depth:Array[Int], n_trees:Array[Int], folds:Int) : org.apache.spark.sql.DataFrame = {
+def random_forest(features:Array[String], percentage:Double, depth:Array[Int], n_trees:Array[Int], folds:Int) : Unit = {
 val assembler = new VectorAssembler().setInputCols(features).setOutputCol("features")
 val rf = new RandomForestClassifier().setLabelCol("fraude").setFeaturesCol("features")
 val Array(trainingData, testData) = base_modelo.randomSplit(Array(percentage, 1 - percentage))
@@ -71,13 +75,15 @@ val cv = new CrossValidator().setEstimator(pipeline).setEvaluator(evaluator).set
 trainingData.cache()
 testData.cache()
 val cvModel = cv.fit(trainingData)
-cvModel.save("rf_fraud_model")
 val predictions = cvModel.transform(testData)
 predictions.cache()
 val results = predictions.withColumn("label", "fraude").withColumn("predicted_label", "prediction").groupBy("label", "predicted_label").agg(count("documento").alias("clientes")).orderBy("label", "predicted_label")
-return results
+val table_name = ("results_random_forest_" ++ features).mkString
+results.createOrReplaceTempView(table_name)
+spark.sql("drop table if exists proceso_seguridad_externa." ++ table_name)
+spark.sql("create table if not exists proceso_seguridad_externa." ++ table_name ++ " stored as parquet as select * from " ++ table_name)
 }
-def logistic_regression(features:Array[String], percentage:Double) : org.apache.spark.sql.DataFrame = {
+def logistic_regression(features:Array[String], percentage:Double) : Unit = {
 val assembler = new VectorAssembler().setInputCols(features).setOutputCol("features")
 val lr = new LogisticRegression().setFamily("binomial").setLabelCol("fraude").setFeaturesCol("features")
 val Array(trainingData, testData) = base_modelo.randomSplit(Array(percentage, 1 - percentage))
@@ -85,13 +91,15 @@ val pipeline = new Pipeline().setStages(Array(assembler, lr))
 trainingData.cache()
 testData.cache()
 val model = pipeline.fit(trainingData)
-model.save("lr_fraud_model")
 val predictions = model.transform(testData)
 predictions.cache()
 val results = predictions.withColumn("label", "fraude").withColumn("predicted_label", "prediction").groupBy("label", "predicted_label").agg(count("documento").alias("clientes")).orderBy("label", "predicted_label")
-return results
+val table_name = ("results_logistic_regresion_" ++ features).mkString
+results.createOrReplaceTempView(table_name)
+spark.sql("drop table if exists proceso_seguridad_externa." ++ table_name)
+spark.sql("create table if not exists proceso_seguridad_externa." ++ table_name ++ " stored as parquet as select * from " ++ table_name)
 }
-def naive_Bayes(features:Array[String], percentage:Double, apriori:String) : org.apache.spark.sql.DataFrame = {
+def naive_Bayes(features:Array[String], percentage:Double, apriori:String) : Unit = {
 val assembler = new VectorAssembler().setInputCols(features).setOutputCol("features")
 val nb = new NaiveBayes().setLabelCol("fraude").setFeaturesCol("features").setModelType(apriori)
 val Array(trainingData, testData) = base_modelo.randomSplit(Array(percentage, 1 - percentage))
@@ -99,10 +107,12 @@ val pipeline = new Pipeline().setStages(Array(assembler, nb))
 trainingData.cache()
 testData.cache()
 val model = pipeline.fit(trainingData)
-model.save("nb_fraud_model")
 val predictions = model.transform(testData)
 predictions.cache()
 val results = predictions.withColumn("label", "fraude").withColumn("predicted_label", "prediction").groupBy("label", "predicted_label").agg(count("documento").alias("clientes")).orderBy("label", "predicted_label")
-return results
+val table_name = ("results_naive_Bayes_" ++ features).mkString
+results.createOrReplaceTempView(table_name)
+spark.sql("drop table if exists proceso_seguridad_externa." ++ table_name)
+spark.sql("create table if not exists proceso_seguridad_externa." ++ table_name ++ " stored as parquet as select * from " ++ table_name)
 }
 }
