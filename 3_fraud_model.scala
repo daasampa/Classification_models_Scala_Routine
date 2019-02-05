@@ -23,7 +23,7 @@ val cvModel = cv.fit(trainingData)
 val predictions = cvModel.transform(testData)
 predictions.cache()
 val results = predictions.withColumnRenamed("label", "fraude").withColumnRenamed("predicted_label", "prediction").groupBy("fraude", "prediction").agg(count("documento").alias("clientes")).orderBy("fraude", "prediction")
-val table_name = ("results_decision_tree_" ++ features).mkString
+val table_name = ("results_decision_tree").mkString
 results.createOrReplaceTempView(table_name)
 spark.sql("drop table if exists proceso_seguridad_externa." ++ table_name)
 spark.sql("create table if not exists proceso_seguridad_externa." ++ table_name ++ " stored as parquet as select * from " ++ table_name)
@@ -43,7 +43,7 @@ val cvModel = cv.fit(trainingData)
 val predictions = cvModel.transform(testData)
 predictions.cache()
 val results = predictions.withColumnRenamed("label", "fraude").withColumnRenamed("predicted_label", "prediction").groupBy("fraude", "prediction").agg(count("documento").alias("clientes")).orderBy("fraude", "prediction")
-val table_name = ("results_ada_boost_" ++ features).mkString
+val table_name = ("results_ada_boost").mkString
 results.createOrReplaceTempView(table_name)
 spark.sql("drop table if exists proceso_seguridad_externa." ++ table_name)
 spark.sql("create table if not exists proceso_seguridad_externa." ++ table_name ++ " stored as parquet as select * from " ++ table_name)
@@ -63,7 +63,7 @@ val cvModel = cv.fit(trainingData)
 val predictions = cvModel.transform(testData)
 predictions.cache()
 val results = predictions.withColumnRenamed("label", "fraude").withColumnRenamed("predicted_label", "prediction").groupBy("fraude", "prediction").agg(count("documento").alias("clientes")).orderBy("fraude", "prediction")
-val table_name = ("results_random_forest_" ++ features).mkString
+val table_name = ("results_random_forest").mkString
 results.createOrReplaceTempView(table_name)
 spark.sql("drop table if exists proceso_seguridad_externa." ++ table_name)
 spark.sql("create table if not exists proceso_seguridad_externa." ++ table_name ++ " stored as parquet as select * from " ++ table_name)
@@ -79,7 +79,7 @@ val model = pipeline.fit(trainingData)
 val predictions = model.transform(testData)
 predictions.cache()
 val results = predictions.withColumnRenamed("label", "fraude").withColumnRenamed("predicted_label", "prediction").groupBy("fraude", "prediction").agg(count("documento").alias("clientes")).orderBy("fraude", "prediction")
-val table_name = ("results_logistic_regresion_" ++ features).mkString
+val table_name = ("results_logistic_regresion").mkString
 results.createOrReplaceTempView(table_name)
 spark.sql("drop table if exists proceso_seguridad_externa." ++ table_name)
 spark.sql("create table if not exists proceso_seguridad_externa." ++ table_name ++ " stored as parquet as select * from " ++ table_name)
@@ -95,7 +95,7 @@ val model = pipeline.fit(trainingData)
 val predictions = model.transform(testData)
 predictions.cache()
 val results = predictions.withColumnRenamed("label", "fraude").withColumnRenamed("predicted_label", "prediction").groupBy("fraude", "prediction").agg(count("documento").alias("clientes")).orderBy("fraude", "prediction")
-val table_name = ("results_naive_Bayes_" ++ features).mkString
+val table_name = ("results_naive_Bayes").mkString
 results.createOrReplaceTempView(table_name)
 spark.sql("drop table if exists proceso_seguridad_externa." ++ table_name)
 spark.sql("create table if not exists proceso_seguridad_externa." ++ table_name ++ " stored as parquet as select * from " ++ table_name)
